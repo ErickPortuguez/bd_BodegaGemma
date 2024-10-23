@@ -600,87 +600,29 @@ SELECT * FROM sale_detail;
 SELECT * FROM product;
 
 
----registros para reserva:--
+---registros para reserva y detalle :--
+DECLARE
+    v_reservation_id INTEGER;
+BEGIN
+    -- 1. Insertar una nueva reserva
+    INSERT INTO reservation (seller_id, client_id, payment_method_id, reservation_date, active)
+    VALUES (1, 1, 1, TO_TIMESTAMP('2024-10-25 15:00:00', 'YYYY-MM-DD HH24:MI:SS'), 'A') 
+    RETURNING id INTO v_reservation_id; -- Guardar el ID de la nueva reserva
 
--- Registro 1
-INSERT INTO reserva (seller_id, client_id, product_id, payment_method_id, fecha_reserva, cantidad_producto, estado_reserva, comentario, total_reserva) 
-VALUES (1, 2, 4, 1, TO_TIMESTAMP('2024-10-15 19:00:00', 'YYYY-MM-DD HH24:MI:SS'), 2, 'pendiente', 'Reserva para cena', 60.00);
+    -- 2. Insertar detalles de la reserva (el subtotal se calculará automáticamente)
+    INSERT INTO reservation_detail (reservation_id, product_id, amount)
+    VALUES (v_reservation_id, 1, 2); -- El subtotal se calculará automáticamente
+    INSERT INTO reservation_detail (reservation_id, product_id, amount)
+    VALUES (v_reservation_id, 2, 1); -- El subtotal se calculará automáticamente
 
-INSERT INTO reserva (seller_id, client_id, product_id, payment_method_id, fecha_reserva, cantidad_producto, estado_reserva, comentario, total_reserva) 
-VALUES (1, 2, 3, 1, TO_TIMESTAMP('2024-10-15 19:00:00', 'YYYY-MM-DD HH24:MI:SS'), 1, 'pendiente', 'Reserva para cena', 30.00);
+    COMMIT; -- Asegúrate de hacer commit para guardar los cambios
+END;
+/
 
-INSERT INTO reserva (seller_id, client_id, product_id, payment_method_id, fecha_reserva, cantidad_producto, estado_reserva, comentario, total_reserva) 
-VALUES (1, 2, 5, 1, TO_TIMESTAMP('2024-10-15 19:00:00', 'YYYY-MM-DD HH24:MI:SS'), 3, 'pendiente', 'Reserva para cena', 90.00);
-
--- Registro 2
-INSERT INTO reserva (seller_id, client_id, product_id, payment_method_id, fecha_reserva, cantidad_producto, estado_reserva, comentario, total_reserva) 
-VALUES (2, 3, 2, 2, TO_TIMESTAMP('2024-10-16 13:00:00', 'YYYY-MM-DD HH24:MI:SS'), 1, 'confirmada', 'Reserva para almuerzo', 25.00);
-
-INSERT INTO reserva (seller_id, client_id, product_id, payment_method_id, fecha_reserva, cantidad_producto, estado_reserva, comentario, total_reserva) 
-VALUES (2, 3, 6, 2, TO_TIMESTAMP('2024-10-16 13:00:00', 'YYYY-MM-DD HH24:MI:SS'), 2, 'confirmada', 'Reserva para almuerzo', 50.00);
-
-INSERT INTO reserva (seller_id, client_id, product_id, payment_method_id, fecha_reserva, cantidad_producto, estado_reserva, comentario, total_reserva) 
-VALUES (2, 3, 1, 2, TO_TIMESTAMP('2024-10-16 13:00:00', 'YYYY-MM-DD HH24:MI:SS'), 1, 'confirmada', 'Reserva para almuerzo', 20.00);
-
--- Registro 3
-INSERT INTO reserva (seller_id, client_id, product_id, payment_method_id, fecha_reserva, cantidad_producto, estado_reserva, comentario, total_reserva) 
-VALUES (3, 4, 3, 1, TO_TIMESTAMP('2024-10-17 20:00:00', 'YYYY-MM-DD HH24:MI:SS'), 1, 'pendiente', 'Reserva para evento especial', 30.00);
-
-INSERT INTO reserva (seller_id, client_id, product_id, payment_method_id, fecha_reserva, cantidad_producto, estado_reserva, comentario, total_reserva) 
-VALUES (3, 4, 4, 1, TO_TIMESTAMP('2024-10-17 20:00:00', 'YYYY-MM-DD HH24:MI:SS'), 2, 'pendiente', 'Reserva para evento especial', 60.00);
-
-INSERT INTO reserva (seller_id, client_id, product_id, payment_method_id, fecha_reserva, cantidad_producto, estado_reserva, comentario, total_reserva) 
-VALUES (3, 4, 5, 1, TO_TIMESTAMP('2024-10-17 20:00:00', 'YYYY-MM-DD HH24:MI:SS'), 3, 'pendiente', 'Reserva para evento especial', 90.00);
-
--- Registro 4
-INSERT INTO reserva (seller_id, client_id, product_id, payment_method_id, fecha_reserva, cantidad_producto, estado_reserva, comentario, total_reserva) 
-VALUES (4, 5, 1, 3, TO_TIMESTAMP('2024-10-18 18:30:00', 'YYYY-MM-DD HH24:MI:SS'), 1, 'cancelada', 'Reserva cancelada', 20.00);
-
-INSERT INTO reserva (seller_id, client_id, product_id, payment_method_id, fecha_reserva, cantidad_producto, estado_reserva, comentario, total_reserva) 
-VALUES (4, 5, 2, 3, TO_TIMESTAMP('2024-10-18 18:30:00', 'YYYY-MM-DD HH24:MI:SS'), 1, 'cancelada', 'Reserva cancelada', 25.00);
-
-INSERT INTO reserva (seller_id, client_id, product_id, payment_method_id, fecha_reserva, cantidad_producto, estado_reserva, comentario, total_reserva) 
-VALUES (4, 5, 3, 3, TO_TIMESTAMP('2024-10-18 18:30:00', 'YYYY-MM-DD HH24:MI:SS'), 2, 'cancelada', 'Reserva cancelada', 60.00);
-
--- Registro 5
-INSERT INTO reserva (seller_id, client_id, product_id, payment_method_id, fecha_reserva, cantidad_producto, estado_reserva, comentario, total_reserva) 
-VALUES (5, 6, 6, 1, TO_TIMESTAMP('2024-10-19 12:00:00', 'YYYY-MM-DD HH24:MI:SS'), 2, 'confirmada', 'Reserva para grupo', 50.00);
-
-INSERT INTO reserva (seller_id, client_id, product_id, payment_method_id, fecha_reserva, cantidad_producto, estado_reserva, comentario, total_reserva) 
-VALUES (5, 6, 4, 1, TO_TIMESTAMP('2024-10-19 12:00:00', 'YYYY-MM-DD HH24:MI:SS'), 1, 'confirmada', 'Reserva para grupo', 30.00);
-
-INSERT INTO reserva (seller_id, client_id, product_id, payment_method_id, fecha_reserva, cantidad_producto, estado_reserva, comentario, total_reserva) 
-VALUES (5, 6, 2, 1, TO_TIMESTAMP('2024-10-19 12:00:00', 'YYYY-MM-DD HH24:MI:SS'), 2, 'confirmada', 'Reserva para grupo', 50.00);
-
---registros para reserva detalle--
-
--- Detalle de reserva para la reserva con ID 6 (ID 1)
-INSERT INTO reserva_detalle (reserva_id, product_id, cantidad, precio_unitario, subtotal) VALUES (6, 4, 1, 15.00, 15.00);
-INSERT INTO reserva_detalle (reserva_id, product_id, cantidad, precio_unitario, subtotal) VALUES (6, 5, 1, 20.00, 20.00);
-INSERT INTO reserva_detalle (reserva_id, product_id, cantidad, precio_unitario, subtotal) VALUES (6, 6, 1, 25.00, 25.00);
-
--- Detalle de reserva para la reserva con ID 7 (ID 2)
-INSERT INTO reserva_detalle (reserva_id, product_id, cantidad, precio_unitario, subtotal) VALUES (7, 3, 1, 30.00, 30.00);
-INSERT INTO reserva_detalle (reserva_id, product_id, cantidad, precio_unitario, subtotal) VALUES (7, 4, 1, 15.00, 15.00);
-INSERT INTO reserva_detalle (reserva_id, product_id, cantidad, precio_unitario, subtotal) VALUES (7, 5, 1, 20.00, 20.00);
-
--- Detalle de reserva para la reserva con ID 8 (ID 3)
-INSERT INTO reserva_detalle (reserva_id, product_id, cantidad, precio_unitario, subtotal) VALUES (8, 6, 1, 25.00, 25.00);
-INSERT INTO reserva_detalle (reserva_id, product_id, cantidad, precio_unitario, subtotal) VALUES (8, 5, 1, 20.00, 20.00);
-INSERT INTO reserva_detalle (reserva_id, product_id, cantidad, precio_unitario, subtotal) VALUES (8, 4, 1, 15.00, 15.00);
-
--- Detalle de reserva para la reserva con ID 9 (ID 4)
-INSERT INTO reserva_detalle (reserva_id, product_id, cantidad, precio_unitario, subtotal) VALUES (9, 5, 1, 20.00, 20.00);
-INSERT INTO reserva_detalle (reserva_id, product_id, cantidad, precio_unitario, subtotal) VALUES (9, 4, 1, 15.00, 15.00);
-INSERT INTO reserva_detalle (reserva_id, product_id, cantidad, precio_unitario, subtotal) VALUES (9, 3, 1, 30.00, 30.00);
-
--- Detalle de reserva para la reserva con ID 10 (ID 5)
-INSERT INTO reserva_detalle (reserva_id, product_id, cantidad, precio_unitario, subtotal) VALUES (10, 6, 1, 25.00, 25.00);
-INSERT INTO reserva_detalle (reserva_id, product_id, cantidad, precio_unitario, subtotal) VALUES (10, 5, 1, 20.00, 20.00);
-INSERT INTO reserva_detalle (reserva_id, product_id, cantidad, precio_unitario, subtotal) VALUES (10, 4, 1, 15.00, 15.00);
+SELECT * FROM reservation;
+SELECT * FROM reservation_detail;
 
 
-SELECT * FROM reserva_detalle;
 
 
 
