@@ -371,92 +371,99 @@ END;
 /
 
 
---reserva--
-CREATE OR REPLACE TRIGGER trg_update_stock_after_reservation
-AFTER INSERT ON reserva_detalle
+--reservation--
+
+-- Trigger para actualizar el stock del producto después de crear un detalle de reserva
+CREATE OR REPLACE TRIGGER trg_update_stock_after_reservation_detail
+AFTER INSERT ON reservation_detail
 FOR EACH ROW
 BEGIN
-    -- Actualizar el stock del producto después de crear una reserva
+    -- Actualizar el stock del producto después de crear un detalle de reserva
     UPDATE product
-    SET stock = stock - :NEW.cantidad
+    SET stock = stock - :NEW.amount
     WHERE id = :NEW.product_id;
 END;
 /
 
-
-CREATE OR REPLACE TRIGGER trg_revert_stock_on_reservation_cancel
-AFTER DELETE ON reserva_detalle
+-- Trigger para revertir el stock del producto si se elimina un detalle de reserva
+CREATE OR REPLACE TRIGGER trg_revert_stock_on_reservation_detail_delete
+AFTER DELETE ON reservation_detail
 FOR EACH ROW
 BEGIN
     -- Revertir el stock del producto si se elimina un detalle de reserva
     UPDATE product
-    SET stock = stock + :OLD.cantidad
+    SET stock = stock + :OLD.amount
     WHERE id = :OLD.product_id;
 END;
 /
 
-
-CREATE OR REPLACE TRIGGER trg_calculate_subtotal_reserva
-BEFORE INSERT OR UPDATE ON reserva_detalle
-FOR EACH ROW
-BEGIN
-    :NEW.subtotal := :NEW.cantidad * :NEW.precio_unitario;
-END;
-/
-
-
-
---ponemos esto para que funcione--
-
-
-ALTER TABLE reserva ADD total_reserva NUMBER(10, 2);
-
---sigue los triggers--
-
-
-CREATE OR REPLACE TRIGGER update_total_reserva
-FOR INSERT OR UPDATE OR DELETE ON reserva_detalle
+-- Trigger para actualizar el total de la reserva después de insertar, actualizar o eliminar un detalle de reserva
+CREATE OR REPLACE TRIGGER trg_update_total_reservation
+FOR INSERT OR UPDATE OR DELETE ON reservation_detail
 COMPOUND TRIGGER
-    TYPE reserva_id_list IS TABLE OF reserva_detalle.reserva_id%TYPE;
-    reserva_ids reserva_id_list := reserva_id_list();
+    TYPE reservation_id_list IS TABLE OF reservation_detail.reservation_id%TYPE;
+    reservation_ids reservation_id_list := reservation_id_list();
 
     BEFORE STATEMENT IS
     BEGIN 
-        reserva_ids.DELETE;
+        reservation_ids.DELETE;
     END BEFORE STATEMENT;
     
     AFTER EACH ROW IS
     BEGIN
         IF DELETING THEN
-            reserva_ids.EXTEND;
-            reserva_ids(reserva_ids.LAST) := :OLD.reserva_id;
+            reservation_ids.EXTEND;
+            reservation_ids(reservation_ids.LAST) := :OLD.reservation_id;
         ELSE
-            reserva_ids.EXTEND;
-            reserva_ids(reserva_ids.LAST) := :NEW.reserva_id;
+            reservation_ids.EXTEND;
+            reservation_ids(reservation_ids.LAST) := :NEW.reservation_id;
         END IF;
     END AFTER EACH ROW;
     
     AFTER STATEMENT IS
     BEGIN
-        FOR i IN reserva_ids.FIRST .. reserva_ids.LAST LOOP
-            UPDATE reserva r
-            SET r.total_reserva = (
-                SELECT NVL(SUM(rd.subtotal), 0)
-                FROM reserva_detalle rd
-                WHERE rd.reserva_id = r.id
+        FOR i IN reservation_ids.FIRST .. reservation_ids.LAST LOOP
+            UPDATE reservation r
+            SET r.total_reservation = (
+                SELECT NVL(SUM(rd.subtotal_reservation), 0)
+                FROM reservation_detail rd
+                WHERE rd.reservation_id = r.id
             )
-            WHERE r.id = reserva_ids(i);
+            WHERE r.id = reservation_ids(i);
         END LOOP;
     END AFTER STATEMENT;
 END;
 /
---reserva_detalle--
-CREATE OR REPLACE TRIGGER calc_subtotal_reserva_detalle
-BEFORE INSERT OR UPDATE ON reserva_detalle
+
+-- Trigger para manejar actualizaciones de stock en caso de actualización de detalles de reserva
+CREATE OR REPLACE TRIGGER trg_update_stock_on_reservation_detail_update
+AFTER UPDATE ON reservation_detail
 FOR EACH ROW
 BEGIN
-    -- Calcular el subtotal multiplicando la cantidad por el precio unitario
-    :NEW.subtotal := :NEW.cantidad * :NEW.precio_unitario;
+    -- Revertir el stock del producto con la cantidad antigua
+    UPDATE product
+    SET stock = stock + :OLD.amount
+    WHERE id = :OLD.product_id;
+
+    -- Actualizar el stock del producto con la nueva cantidad
+    UPDATE product
+    SET stock = stock - :NEW.amount
+    WHERE id = :NEW.product_id;
+END;
+/
+
+-- Trigger para revertir el stock de productos al cancelar la reserva
+CREATE OR REPLACE TRIGGER trg_revert_stock_on_logical_cancel
+AFTER UPDATE OF active ON reservation
+FOR EACH ROW
+WHEN (NEW.active = 'I') -- Suponiendo que 'I' es para inactivo
+BEGIN
+    FOR detail IN (SELECT * FROM reservation_detail WHERE reservation_id = :NEW.id) LOOP
+        -- Revertir el stock del producto
+        UPDATE product
+        SET stock = stock + detail.amount
+        WHERE id = detail.product_id;
+    END LOOP;
 END;
 /
 
