@@ -208,27 +208,27 @@ ALTER TABLE sale_detail ADD CONSTRAINT sale_detail_product
     REFERENCES product (id);
 
 -- 12. A person (client) can make one or many reservations
-ALTER TABLE reserva ADD CONSTRAINT reserva_client
+ALTER TABLE reservation ADD CONSTRAINT reservation_client
     FOREIGN KEY (client_id)
     REFERENCES person (id);
 
 -- 13. A person (seller) can make one or many reservations
-ALTER TABLE reserva ADD CONSTRAINT reserva_seller
+ALTER TABLE reservation ADD CONSTRAINT reservation_seller
     FOREIGN KEY (seller_id)
     REFERENCES person (id);
 
 -- 14. A payment method can be used in one or many reservations
-ALTER TABLE reserva ADD CONSTRAINT reserva_payment_method
+ALTER TABLE reservation ADD CONSTRAINT reservation_payment_method
     FOREIGN KEY (payment_method_id)
     REFERENCES payment_method (id);
 
 -- 15. A reservation can have one or many reservation details
-ALTER TABLE reserva_detalle ADD CONSTRAINT reserva_detalle_reserva
-    FOREIGN KEY (reserva_id)
-    REFERENCES reserva (id);
+ALTER TABLE reservation_detail ADD CONSTRAINT reservation_detail_reservation
+    FOREIGN KEY (reservation_id)
+    REFERENCES reservation (id);
 
 -- 16. A product can appear in one or many reservation details
-ALTER TABLE reserva_detalle ADD CONSTRAINT reserva_detalle_product
+ALTER TABLE reservation_detail ADD CONSTRAINT reservation_detail_product
     FOREIGN KEY (product_id)
     REFERENCES product (id);
 
