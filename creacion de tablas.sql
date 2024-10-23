@@ -131,11 +131,10 @@ CREATE TABLE reservation (
     client_id integer,                                            -- Client's ID making the reservation
     payment_method_id integer,                                    -- Payment method ID used
     total_reservation number(8,2),                                -- Total amount of the reservation
-    reservation_date DATE DEFAULT SYSDATE,                        -- Reservation date and time                                        -- Optional comment on the reservation
+    reservation_date TIMESTAMP,                                  -- Reservation date and time
     active char(1) DEFAULT 'A',                                   -- Status of the reservation (Active/Inactive)
     CONSTRAINT reservation_pk PRIMARY KEY (id)                    -- Primary key
 );
-
 
 
 CREATE TABLE reservation_detail (
