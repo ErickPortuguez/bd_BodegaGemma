@@ -373,6 +373,21 @@ END;
 
 --reservation--
 
+-- Trigger para calcular el subtotal automáticamente en reservation_detail
+CREATE OR REPLACE TRIGGER trg_calculate_subtotal_reservation_detail
+BEFORE INSERT ON reservation_detail
+FOR EACH ROW
+BEGIN
+    -- Obtener el precio del producto desde la tabla product
+    SELECT p.price_unit INTO :NEW.subtotal_reservation
+    FROM product p
+    WHERE p.id = :NEW.product_id;
+
+    -- Calcular el subtotal multiplicando la cantidad por el precio unitario
+    :NEW.subtotal_reservation := :NEW.amount * :NEW.subtotal_reservation;
+END;
+/
+
 -- Trigger para actualizar el stock del producto después de crear un detalle de reserva
 CREATE OR REPLACE TRIGGER trg_update_stock_after_reservation_detail
 AFTER INSERT ON reservation_detail
