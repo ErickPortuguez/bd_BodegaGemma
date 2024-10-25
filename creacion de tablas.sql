@@ -143,7 +143,7 @@ CREATE TABLE reservation_detail (
     product_id integer,                                              -- Reserved product ID
     amount number(8,2),                                            -- Quantity of the reserved product
     subtotal_reservation number(8,2),                                -- Subtotal (quantity * product price)
-    CONSTRAINT reservation_detail_pk PRIMARY KEY (id), 
+    CONSTRAINT reservation_detail_pk PRIMARY KEY (id)
 );
 
 
