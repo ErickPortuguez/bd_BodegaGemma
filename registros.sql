@@ -63,7 +63,7 @@ VALUES ('V','DNI', '82933312', 'Diego', 'Díaz', 1150.00, '912299887', 'diego@ex
 INSERT INTO person (rol_person, type_document, number_document, names, last_name, salary, cell_phone, email, seller_rol, seller_user, seller_password)
 VALUES ('V','DNI', '98273654', 'erick', 'Portuguez', 3000.00, '928116200', 'erick@example.com', 'Administrador', 'erickPZ', 'erick123');
 INSERT INTO person (rol_person, type_document, number_document, names, last_name, salary, cell_phone, email, seller_rol, seller_user, seller_password)
-VALUES ('V','DNI', '98273843', 'maylin', 'jaureigui', 2980.00, '988776655', 'fernando@example.com', 'Administrador', 'maylin', 'maylin123');
+VALUES ('V','DNI', '98273843', 'maylin', 'Jauregui', 2980.00, '988776655', 'maylin@example.com', 'Administrador', 'maylin', 'maylin123');
 INSERT INTO person (rol_person, type_document, number_document, names, last_name, salary, cell_phone, email, seller_rol, seller_user, seller_password)
 VALUES ('V','DNI', '88993364', 'Johan', 'Malazquez', 2550.00, '912299887', 'johan@example.com', 'Administrador', 'johan', 'johan123');
 
